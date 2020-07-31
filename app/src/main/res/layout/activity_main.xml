@@ -8,5 +8,85 @@
     android:id="@+id/parentRelativeLayout">
 
 
+    <RelativeLayout
+        android:id="@+id/Relativeupper"
+        android:layout_width="match_parent"
+        android:layout_height="330dp">
+
+        <ImageView
+            android:id="@+id/imglogo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/txtsongName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imglogo"
+            android:textStyle="italic|bold"
+            android:textSize="25sp"
+            android:textAlignment="center"
+            android:layout_marginTop="16dp"
+            android:textColor="#ff5722"
+            android:textAllCaps="false"
+            android:singleLine="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:ellipsize="marquee"/>
+    </RelativeLayout>
+
+
+
+    <RelativeLayout
+
+        android:id="@+id/Relativelower"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        >
+        <ImageView
+            android:id="@+id/imgprevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/previous"
+            android:layout_marginRight="30dp"
+            android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/imgplay_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/pause"
+            android:layout_toEndOf="@+id/imgprevious"
+            android:layout_marginRight="30dp"
+            android:visibility="invisible"/>
+        <ImageView
+            android:id="@+id/imgnext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"
+            android:layout_toEndOf="@+id/imgplay_pause"
+            android:visibility="invisible"
+            />
+    </RelativeLayout>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEnableVoice"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="8dp"
+        android:layout_marginBottom="45dp"
+        android:text="Enable Voice Command"
+        android:textAllCaps="false"
+        android:textColor="#000000"
+        android:textSize="17sp"
+        android:textStyle="italic|bold"
+        android:typeface="serif"
+        app:backgroundTint="@android:color/transparent"
+        app:cornerRadius="40dp"
+        app:strokeColor="#ffffff"
+        app:strokeWidth="2dp" />
+
 
 </RelativeLayout>
