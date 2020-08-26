@@ -71,14 +71,17 @@ class Main2Activity : AppCompatActivity() {
     {
             val arraylist=ArrayList<File>()
         val allfiles = file.listFiles()
+        val allfiles2=allfiles
 
-        for(individualfile in allfiles)
+
+
+        for(individualfile in allfiles!!)
         {
             if(individualfile.isDirectory() && !individualfile.isHidden())
             {
                 arraylist.addAll(readOnlyAudioSongs(individualfile))
             }
-            else if(individualfile.name.endsWith(".mp3") || individualfile.name.endsWith(".aac")||individualfile.name.endsWith(".wav")||individualfile.name.endsWith(".wma"))
+            else if(individualfile.name.endsWith(".mp3") || individualfile.name.endsWith(".aac")||individualfile.name.endsWith(".wav")||individualfile.name.endsWith(".wma")||individualfile.name.endsWith(".mpeg"))
           //  {
                 {
                     arraylist.add(individualfile)
@@ -107,7 +110,7 @@ fun displayAudioSongsName()
 
 
     var i=0
-    msongslist.setOnClickListener {
+    msongslist.setOnItemClickListener { arrayadapter,view,i,j->
         var songName=msongslist.getItemAtPosition(i).toString()
         val intent=Intent(this,MainActivity::class.java)
 
@@ -117,7 +120,7 @@ fun displayAudioSongsName()
 //        intent.putExtra("song",audioSongs)
 //        intent.putExtra("name",songName)
 //        intent.putExtra("position",i)
-        i=i+1
+        //i=i+1
         startActivity(intent)
     }
 }

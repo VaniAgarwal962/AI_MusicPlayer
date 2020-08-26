@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var speechRecognizer: SpeechRecognizer
     lateinit var speechRecognizerIntent: Intent
-    lateinit var keeper:String
+     var keeper=""
 
 
     lateinit var play_pause:ImageView
@@ -47,10 +47,12 @@ class MainActivity : AppCompatActivity() {
     var mode:String="ON"
 
 
-    lateinit var mediaplayer:MediaPlayer
-    var position:Int =0
-    lateinit var mysongs:ArrayList<File>
-    var msongName:String="ee"
+    lateinit var mediaplayer: MediaPlayer
+    //var mediaplayer:MediaPlayer?=null
+     var position:Int=0
+    lateinit var mySongs:ArrayList<File>
+    lateinit var mSongName:String
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +61,18 @@ class MainActivity : AppCompatActivity() {
         
 
         checkVoiceCommandPermission()
+        mediaplayer= MediaPlayer()
+
+
+
+
+
+
+        speechRecognizer= SpeechRecognizer.createSpeechRecognizer(this@MainActivity)
+        speechRecognizerIntent=Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+
         parentRelativeLayout=findViewById(R.id.parentRelativeLayout)
 
 
@@ -71,21 +85,18 @@ class MainActivity : AppCompatActivity() {
         btnEnableVoice=findViewById(R.id.btnEnableVoice)
 
 
-        speechRecognizer= SpeechRecognizer.createSpeechRecognizer(this@MainActivity)
-        speechRecognizerIntent=Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
 
+
+
+        ValidateReceiveValuesandStartPlaying()
+        musicImage.setBackgroundResource(R.drawable.mymusiclogo)
 
 
         speechRecognizer.setRecognitionListener(object:RecognitionListener{
             override fun onReadyForSpeech(p0: Bundle?) {
-
-
             }
 
             override fun onRmsChanged(p0: Float) {
-
             }
 
             override fun onBufferReceived(p0: ByteArray?) {
@@ -112,17 +123,61 @@ class MainActivity : AppCompatActivity() {
 
             }
 
-            override fun onResults(p0: Bundle?) {
-                val matchesFound:ArrayList<String> = p0?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) as ArrayList<String>
-                if(matchesFound!=null)
-                {
-                    keeper=matchesFound.get(0)
-                    Toast.makeText(this@MainActivity,"Result= "+keeper,Toast.LENGTH_SHORT).show()
+            override fun onResults(result: Bundle?) {
+
+
+
+                val matchesFound = result!!.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+
+
+
+
+
+                if(matchesFound!=null) {
+
+
+
+                    if (mode=="ON") {
+
+
+
+                        keeper = matchesFound.get(0)
+
+
+
+                        if (keeper=="pause the song") {
+
+
+
+                            playpauseSong()
+
+                            Toast.makeText(this@MainActivity, "Command= "+keeper, Toast.LENGTH_LONG).show()
+
+                        }
+                        else if (keeper=="play the song") {
+                            playpauseSong()
+                            Toast.makeText(this@MainActivity, "Command= "+keeper, Toast.LENGTH_LONG)
+                                .show()
+                        }
+
+                        //                 Toast.makeText(this@MainActivity,"Result= "+keeper,Toast.LENGTH_SHORT).show()
+
+
+                        else if (keeper=="play next song") {
+                            playNextSong()
+                            Toast.makeText(this@MainActivity, "Command= "+keeper, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                        else if (keeper=="play previous song") {
+                            playPreviousSong()
+                            Toast.makeText(this@MainActivity, "Command= "+keeper, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }
                 }
-
             }
-
-        })
+        }
+        )
 
 
         parentRelativeLayout.setOnTouchListener(View.OnTouchListener{v,motionEvent->
@@ -132,7 +187,6 @@ class MainActivity : AppCompatActivity() {
                 {
                     speechRecognizer.startListening(speechRecognizerIntent)
                     keeper=""
-
                 }
                 MotionEvent.ACTION_UP->
                 {
@@ -151,36 +205,69 @@ class MainActivity : AppCompatActivity() {
             if(mode=="ON")
             {
                 mode="OFF";
-                btnEnableVoice.text="Enable Voice Command"
-                Toast.makeText(this,"Press to enable voice command",Toast.LENGTH_LONG).show()
+                btnEnableVoice.text="Voice Command is OFF"
+                //Toast.makeText(this,"Press to enable voice command",Toast.LENGTH_LONG).show()
                 Relativelower.visibility=View.VISIBLE
+
+
             }
             else{
                 mode="ON";
-                btnEnableVoice.text="Voice Command Enabled"
-                Toast.makeText(this,"Speak to play song",Toast.LENGTH_LONG).show()
+                btnEnableVoice.text="Voice Command is ON"
+               // Toast.makeText(this,"Speak to play song",Toast.LENGTH_LONG).show()
                 Relativelower.visibility=View.GONE
             }
         }
 
+        play_pause.setOnClickListener {
+            playpauseSong()
+        }
+
+        previous.setOnClickListener {
+            if(mediaplayer.currentPosition>0)
+                playPreviousSong()
+
+        }
+        next.setOnClickListener {
+            if(mediaplayer.currentPosition>0)
+                playNextSong()
+
+        }
+
+
     }
 
 
-    private fun ValidateReceiveValuesandStartPlaying()
+    fun ValidateReceiveValuesandStartPlaying()
     {
+
+        val songlist=intent.getParcelableExtra<Songlist>("song")
+        mySongs=songlist!!.song
+        mSongName=songlist.songName
+        position=songlist.position
+        songName.text=mSongName
+        songName.isSelected=true
+
+        val uri=Uri.parse(mySongs.get(position).toString())
+
+
+
         if(mediaplayer!=null)
         {
             mediaplayer.stop()
             mediaplayer.release()
-        }
+         //   Toast.makeText(this,"heyyyyy",Toast.LENGTH_LONG).show()
 
-        mysongs=intent.getParcelableArrayListExtra<File>("song")
+        }
+        mediaplayer=MediaPlayer.create(this,uri)
+
+        mediaplayer.start()
 
     }
 
 
 
-    private fun checkVoiceCommandPermission()
+     fun checkVoiceCommandPermission()
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         if(!(ContextCompat.checkSelfPermission(this@MainActivity,Manifest.permission.RECORD_AUDIO)==PackageManager.PERMISSION_GRANTED))
@@ -193,5 +280,82 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+     fun playpauseSong()
+    {
+        musicImage.setBackgroundResource(R.drawable.one)
+        if(mediaplayer.isPlaying)
+        {
+            play_pause.setImageResource(R.drawable.play)
+            mediaplayer.pause()
+        }
+        else
+        {
+            play_pause.setImageResource(R.drawable.pause)
+            mediaplayer.start()
+            musicImage.setBackgroundResource(R.drawable.two)
+        }
+    }
 
+    override fun onDestroy() {
+        mediaplayer.stop()
+        mediaplayer.release()
+        super.onDestroy()
+    }
+
+    fun playNextSong()
+    {
+        mediaplayer.pause()
+        mediaplayer.stop()
+        mediaplayer.release()
+
+        position=((position+1)%mySongs.size)
+         val uri=Uri.parse(mySongs.get(position).toString())
+        mediaplayer=MediaPlayer.create(this,uri)
+        mSongName=mySongs.get(position).toString()
+        songName.text=mSongName
+        musicImage.setBackgroundResource(R.drawable.three)
+
+        if(mediaplayer.isPlaying)
+        {
+            play_pause.setImageResource(R.drawable.pause)
+
+        }
+        else
+        {
+            play_pause.setImageResource(R.drawable.play)
+
+            musicImage.setBackgroundResource(R.drawable.two)
+        }
+    }
+
+    fun playPreviousSong()
+    {
+        mediaplayer.pause()
+        mediaplayer.stop()
+        mediaplayer.release()
+
+        if((position-1)<0)
+            position=(mySongs.size-1)
+        else
+            position=(position-1)
+
+        val uri=Uri.parse(mySongs.get(position).toString())
+        mediaplayer=MediaPlayer.create(this,uri)
+        mSongName=mySongs.get(position).toString()
+        songName.text=mSongName
+        musicImage.setBackgroundResource(R.drawable.four)
+
+
+        if(mediaplayer.isPlaying)
+        {
+            play_pause.setImageResource(R.drawable.pause)
+
+        }
+        else
+        {
+            play_pause.setImageResource(R.drawable.play)
+
+            musicImage.setBackgroundResource(R.drawable.two)
+        }
+    }
 }

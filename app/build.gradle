@@ -9,9 +9,9 @@ android {
     buildToolsVersion "30.0.1"
 
 //----------------------------//
-   //for parcelable in model
-    androidExtensions{
-        experimental=true
+    //for parcelable in model
+    androidExtensions {
+        experimental = true
     }
 //----------------------------//
     defaultConfig {
